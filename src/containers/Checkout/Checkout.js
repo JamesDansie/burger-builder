@@ -12,10 +12,32 @@ class Checkout extends Component {
         }
     }
 
+    componentDidMount () {
+        const queryParams = new URLSearchParams(this.props.location.search);
+        const ingredients = {};
+        // from burger builder the first param is the name and the second param is the value. + converts value to a number.
+        for(let param of queryParams.entries()){
+            ingredients[param[0]] = +param[1];
+        }
+        this.setState({ingredients: ingredients});
+    }
+
+    checkoutCancelledHandler = () => {
+        this.props.history.goBack();
+    }
+
+    checkoutContinuedHandler = () => {
+        this.props.history.replace('/checkout/contact-data');
+    }
+
     render() {
         return (
             <div>
-                <CheckoutSummary ingredients={this.state.ingredients} />
+                <CheckoutSummary 
+                    ingredients={this.state.ingredients} 
+                    checkoutCancelled={this.checkoutCancelledHandler}
+                    checkoutContinue={this.checkoutContinuedHandler}
+                />
             </div>
         );
     }
