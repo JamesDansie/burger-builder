@@ -15,7 +15,11 @@ class ContactData extends Component {
                     type: 'text',
                     placeholder: 'Your Name'
                 },
-                Value: ''
+                validation: {
+                    required: true
+                },
+                valid: false,
+                value: ''
             },
             street: {
                 elementType: 'input',
@@ -23,7 +27,11 @@ class ContactData extends Component {
                     type: 'text',
                     placeholder: 'Your Street'
                 },
-                Value: ''
+                validation: {
+                    required: true
+                },
+                valid: false,
+                value: ''
             },
             zipCode: {
                 elementType: 'input',
@@ -31,7 +39,13 @@ class ContactData extends Component {
                     type: 'text',
                     placeholder: 'Your Zip code'
                 },
-                Value: ''
+                validation: {
+                    required: true,
+                    minLength: 5,
+                    maxLength: 5
+                },
+                valid: false,
+                value: ''
             },
             country: {
                 elementType: 'input',
@@ -39,7 +53,11 @@ class ContactData extends Component {
                     type: 'text',
                     placeholder: 'Your Country'
                 },
-                Value: ''
+                validation: {
+                    required: true
+                },
+                valid: false,
+                value: ''
             },
             email: {
                 elementType: 'input',
@@ -47,7 +65,11 @@ class ContactData extends Component {
                     type: 'email',
                     placeholder: 'Your Email'
                 },
-                Value: ''
+                validation: {
+                    required: true
+                },
+                valid: false,
+                value: ''
             },
             deliveryMethod: {
                 elementType: 'select',
@@ -57,25 +79,47 @@ class ContactData extends Component {
                         {value: 'cheapest', displayValue: 'Cheapest'}
                     ]
                 },
-                Value: ''
+                value: 'fastest'
             },
         },
         loading: false
     }
 
+    checkValidation(value, rules) {
+        let isValid = true;
+
+        if(rules.required) {
+            isValid = value.trim() !== '' && isValid;
+        }
+
+        if(rules.minLength) {
+            isValid = value.length >= rules.minLength && isValid;
+        }
+
+        if(rules.maxLength) {
+            isValid = value.length <= rules.maxLength && isValid;
+        }
+
+        return isValid;
+    }
+
     orderHandler = (event) => {
-        console.log('order handler price is ' + this.props.totalPrice)
         alert('You continued! :D')
         // in reality calculate the price server side to make it secure
         this.setState({loading: true});
+        const formData = {};
+        for(let formEleIdentifier in this.state.orderForm) {
+            formData[formEleIdentifier] = this.state.orderForm[formEleIdentifier].value;
+        }
         const order = {
             ingredients: this.props.ingredients,
             price: this.props.totalPrice,
-
+            orderData: formData
         }
+        console.log('[orderHandler]')
+        console.log(order)
         axios.post('/orders.json', order)
             .then(response => {
-                console.log(response);
                 this.setState({loading: false});
                 this.props.history.push('/');
             })
@@ -84,8 +128,23 @@ class ContactData extends Component {
                 this.setState({loading: false});
             });
         event.preventDefault();
-        console.log(this.props.ingredients)
     };
+
+    // it is important to update state using immutable methods, so copy all the pieces, then update the copies instead of updating directly.
+    inputChangedHandler = (event, inputIdentifier) => {
+        const updatedOrderForm = {
+            ...this.state.orderForm
+        };
+        const updatedFormElement = {
+            ...updatedOrderForm[inputIdentifier]
+        }    
+        updatedFormElement.value = event.target.value;
+        updatedFormElement.valid = this.checkValidation(updatedFormElement.value, updatedFormElement.validation);
+        updatedOrderForm[inputIdentifier] = updatedFormElement;
+        this.setState({orderForm: updatedOrderForm})
+        console.log('[inputChangeHandler]')
+        console.log(updatedOrderForm)
+    }
 
     render () {
         const formElementsArray = [];
@@ -96,17 +155,17 @@ class ContactData extends Component {
             });
         }
         let form = (
-            <form>
+            <form onSubmit={this.orderHandler}>
                 {formElementsArray.map(formEle => (
                     <Input 
                         key={formEle.id}
                         elementType={formEle.config.elementType} 
                         elementConfig={formEle.config.elementConfig}
                         value={formEle.config.value}
+                        changed={(event) => this.inputChangedHandler(event, formEle.id)}
                     />
                 ))}
-                
-                <Button btnType="Success" clicked={this.orderHandler}>Order</Button>
+                <Button btnType="Success">Order</Button>
             </form>
         );
         if(this.state.loading) {
