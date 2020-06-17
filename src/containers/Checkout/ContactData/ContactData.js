@@ -52,11 +52,11 @@ class ContactData extends Component {
     render () {
         let form = (
             <form>
-                    <input className={classes.Input} type="text" name="name" placeholder="Your Name" />
-                    <input className={classes.Input} type="text" name="email" placeholder="Your Email" />
-                    <input className={classes.Input} type="text" name="street" placeholder="Your Street" />
-                    <input className={classes.Input} type="text" name="postalCode" placeholder="Your Postal Code" />
-                    <Button btnType="Success" clicked={this.orderHandler}>Order</Button>
+                <input className={classes.Input} type="text" name="name" placeholder="Your Name" />
+                <input className={classes.Input} type="text" name="email" placeholder="Your Email" />
+                <input className={classes.Input} type="text" name="street" placeholder="Your Street" />
+                <input className={classes.Input} type="text" name="postalCode" placeholder="Your Postal Code" />
+                <Button btnType="Success" clicked={this.orderHandler}>Order</Button>
             </form>
         );
         if(this.state.loading) {

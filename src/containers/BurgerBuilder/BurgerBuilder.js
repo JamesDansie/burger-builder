@@ -8,7 +8,6 @@ import OrderSummary from '../../components/Burger/OrderSummary/OrderSummary';
 import Spinner from '../../components/UI/Spinner/Spinner';
 import withErrorHandler from '../../hoc/withErrorHandler/withErrorHandler';
 import axios from '../../axios-orders';
-import { wait } from '@testing-library/react';
 
 const INGREDIENT_PRICES = {
     salad: 0.5,
